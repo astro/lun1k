@@ -5,6 +5,8 @@
 #include <math.h>
 #include "../libs/text.h"
 
+#include "tunnel_tex.h"
+
 
 #define MIN(a, b) (a < b ? a : b)
 
@@ -34,7 +36,7 @@ static double pythagoras( double side1, double side2 )
 }
 
 
-static uint8_t zTable[2 * LED_WIDTH][2 * LED_HEIGHT];
+static uint16_t zTable[2 * LED_WIDTH][2 * LED_HEIGHT];
 static uint16_t aTable[2 * LED_WIDTH][2 * LED_HEIGHT];
 static int16_t shiftLookX = 0; //LED_WIDTH / 2;
 static int16_t shiftLookY = 0; //LED_HEIGHT / 2;
@@ -53,7 +55,7 @@ void initTables() {
                 1 /
                 (pythagoras(x1, y1)
                  + 1);
-            uint8_t z = MIN(0xff, 0xff * distance);
+            uint16_t z = MIN(0xfff, 0xfff * distance);
             zTable[x][y] = z;
 
             double angle = atan2(x1, y1);
@@ -64,19 +66,7 @@ void initTables() {
 }
 
 static uint32_t __attribute__((always_inline)) getTex(uint16_t a, uint16_t z) {
-    /* Grid, turn these knobs for texture flickr */
-    uint8_t am8 = (a >> 7) & 0xf;
-    uint8_t zm8 = (z >> 0) & 0x3;
-    if (am8 == 2 && zm8 == 2)
-        return 0xffff7f;
-    if (am8 == 2 || zm8 == 2)
-        return 0x3f1f00;
-
-    /* TODO: nifty texture */
-
-    /* Bricks */
-    /* printf("z: %i\n", z); */
-    return 0xff00ff | ((z << 10) & 0xff00);
+    return texGetRGB(z, a >> 6);
 }
 
 static uint8_t tick(char* nick) {
@@ -96,12 +86,19 @@ static uint8_t tick(char* nick) {
             uint16_t a = aTable[x + shiftLookX][y + shiftLookY];
             /* printf("%ix%i\ta=%04X\tz=%04X\n", x, y, a, z); */
             uint32_t texel = getTex(a + t * 0xf, z + t / 10);
+            uint16_t r = (texel & 0xff0000) >> 16;
+            uint16_t g = (texel & 0xff00) >> 8;
+            uint16_t b = texel & 0xff;
             /* shade proportional to z */
-            uint8_t r = ((texel & 0xff0000) >> 16) / (1 | z >> 1);
-            uint8_t g = ((texel & 0xff00) >> 8) / (1 | z >> 1);
-            uint8_t b = (texel & 0xff) / (1 | z >> 1);
-            if (x % 10 == 0 && y % 10 == 0)
-                printf("z=%03X\t%02X%02X%02X\n", z, r, g, b);
+            uint16_t f = 0xff - MIN(0xff, z);
+            if (x + shiftLookX >= LED_WIDTH - 2 && x + shiftLookX <= LED_WIDTH + 2 &&
+                y + shiftLookY >= LED_HEIGHT - 2 && y + shiftLookY <= LED_HEIGHT + 2)
+                printf("%ix%i: z=%X f=%X\n", x + shiftLookX, y + shiftLookY, z, f);
+            r = (f * (uint16_t)r) >> 8;
+            g = f * (uint16_t)g / 0xff;
+            b = f * b / 0xff;
+            /* if (x % 10 == 0 && y % 10 == 0) */
+            /*     printf("z=%03X\t%02X%02X%02X\n", z, r, g, b); */
             setLedXY(x, y, r, g, b);
         }
     }
