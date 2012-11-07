@@ -53,7 +53,7 @@ void initTables() {
                 1 /
                 (pythagoras(x1, y1)
                  + 1);
-            uint8_t z = MIN(0xfff, 0xfff * distance);
+            uint8_t z = MIN(0xff, 0xff * distance);
             zTable[x][y] = z;
 
             double angle = atan2(x1, y1);
@@ -63,22 +63,10 @@ void initTables() {
     }
 }
 
-struct brick {
-    uint8_t r, g, b;
-};
-struct brick bricks[] = {
-    { 255, 0, 0 },
-    { 0, 255, 0 },
-    { 0, 0, 255 },
-    { 255, 255, 0 },
-    { 0, 255, 255 },
-    { 255, 255, 255}
-};
-
 static uint32_t __attribute__((always_inline)) getTex(uint16_t a, uint16_t z) {
     /* Grid, turn these knobs for texture flickr */
     uint8_t am8 = (a >> 7) & 0xf;
-    uint8_t zm8 = (z >> 0) & 0x1f;
+    uint8_t zm8 = (z >> 0) & 0x3;
     if (am8 == 2 && zm8 == 2)
         return 0xffff7f;
     if (am8 == 2 || zm8 == 2)
@@ -87,10 +75,8 @@ static uint32_t __attribute__((always_inline)) getTex(uint16_t a, uint16_t z) {
     /* TODO: nifty texture */
 
     /* Bricks */
-    uint8_t brickI = ((a >> 12) + (z >> 4)) % sizeof(bricks);
-    /* printf("Brick %i/%i\t(a=%04X\tz=%04X)\n", brickI, sizeof(bricks), a, z); */
-    struct brick brick = bricks[brickI];
-    return (uint16_t)brick.r << 16 | (uint16_t)brick.g << 8 | (uint16_t)brick.b;
+    /* printf("z: %i\n", z); */
+    return 0xff00ff | ((z << 10) & 0xff00);
 }
 
 static uint8_t tick(char* nick) {
@@ -106,14 +92,16 @@ static uint8_t tick(char* nick) {
         for(x = 0; x < LED_WIDTH; x++) 
         {
             /* TODO: delta speed from shiftLook[XY] */
-            uint16_t z = zTable[x + shiftLookX][y + shiftLookY] + t;
-            uint16_t a = aTable[x + shiftLookX][y + shiftLookY] + t * 0xf;
+            uint16_t z = zTable[x + shiftLookX][y + shiftLookY];
+            uint16_t a = aTable[x + shiftLookX][y + shiftLookY];
             /* printf("%ix%i\ta=%04X\tz=%04X\n", x, y, a, z); */
-            uint32_t texel = getTex(a, z);
-            /* TODO: shade proportional to z */
-            uint8_t r = ((texel & 0xff0000) >> 16);
-            uint8_t g = ((texel & 0xff00) >> 8);
-            uint8_t b = (texel & 0xff);
+            uint32_t texel = getTex(a + t * 0xf, z + t / 10);
+            /* shade proportional to z */
+            uint8_t r = ((texel & 0xff0000) >> 16) / (1 | z >> 1);
+            uint8_t g = ((texel & 0xff00) >> 8) / (1 | z >> 1);
+            uint8_t b = (texel & 0xff) / (1 | z >> 1);
+            if (x % 10 == 0 && y % 10 == 0)
+                printf("z=%03X\t%02X%02X%02X\n", z, r, g, b);
             setLedXY(x, y, r, g, b);
         }
     }
