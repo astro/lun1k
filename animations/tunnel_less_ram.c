@@ -15,7 +15,7 @@
 #include "libs/text.h"
 #include "libs/math.h"
 
-#include "tunnel_tex.h"
+#include "lib/tunnel_tex.h"
 
 #define MIN(a, b) (a < b ? a : b)
 

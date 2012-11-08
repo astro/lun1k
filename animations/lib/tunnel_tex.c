@@ -1,3 +1,6 @@
+
+#include "tunnel_tex.h"
+
 struct tex {
   unsigned int 	 width;
   unsigned int 	 height;

@@ -166,7 +166,12 @@ void draw_number_8x6(uint8_t x, uint8_t y, int32_t number, uint8_t length, uint8
 {
 
 	char s[10];
+#ifdef SIMULATOR
+	sprintf(s, "%i", number);
+#else
 	sprintf(s, "%li", number);
+#endif
+
 	int len = strlen(s);
 
 	if (length < len) {

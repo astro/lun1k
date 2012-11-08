@@ -142,6 +142,7 @@ int main(int argc __attribute__((__unused__)), char *argv[] __attribute__((__unu
 	int running = 1;
 	//unsigned long long int startTime = get_clock();
 	while(running) {
+		Uint32 frameStart = SDL_GetTicks(); 
 		SDL_Event ev;
 		while(SDL_PollEvent(&ev)) {
 			switch(ev.type) {
@@ -253,7 +254,15 @@ int main(int argc __attribute__((__unused__)), char *argv[] __attribute__((__unu
 //		SDL_FreeSurface(text);
 		
 		SDL_Flip(screen);
-		
+
+
+		Uint32 frameStop = SDL_GetTicks(); 
+
+		if( (frameStop-frameStart) < 33 )
+		{
+			SDL_Delay(33 - (frameStop-frameStart));
+		}
+
 		
 		
 		tick_count++;

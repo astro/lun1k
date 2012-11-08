@@ -20,7 +20,8 @@ endif
 SRC=$(wildcard  *.c libs/*.c) \
 	core/syscalls.c core/stm32fxxx_it.c core/system_stm32f$(STM32F)xx.c \
 	../animations/plasma_bigsin.c \
-	../animations/plasma_bigsin.c
+	../animations/plasma_weed.c 
+#	../animations/tunnel_less_ram.c 
 
 
 ASRC=core/startup_stm32f$(STM32F)xx.s
