@@ -90,13 +90,13 @@ static uint8_t tick(char* nick) {
             uint16_t g = (texel & 0xff00) >> 8;
             uint16_t b = texel & 0xff;
             /* shade proportional to z */
-            uint16_t f = 0xff - MIN(0xff, z);
-            if (x + shiftLookX >= LED_WIDTH - 2 && x + shiftLookX <= LED_WIDTH + 2 &&
-                y + shiftLookY >= LED_HEIGHT - 2 && y + shiftLookY <= LED_HEIGHT + 2)
-                printf("%ix%i: z=%X f=%X\n", x + shiftLookX, y + shiftLookY, z, f);
-            r = (f * (uint16_t)r) >> 8;
-            g = f * (uint16_t)g / 0xff;
-            b = f * b / 0xff;
+            uint16_t f = 0x1ff - MIN(0x1ff, z);
+            /* if (x + shiftLookX >= LED_WIDTH - 2 && x + shiftLookX <= LED_WIDTH + 2 && */
+            /*     y + shiftLookY >= LED_HEIGHT - 2 && y + shiftLookY <= LED_HEIGHT + 2) */
+            /*     printf("%ix%i: z=%X f=%X\n", x + shiftLookX, y + shiftLookY, z, f); */
+            r = f * r >> 9;
+            g = f * g >> 9;
+            b = f * b >> 9;
             /* if (x % 10 == 0 && y % 10 == 0) */
             /*     printf("z=%03X\t%02X%02X%02X\n", z, r, g, b); */
             setLedXY(x, y, r, g, b);
