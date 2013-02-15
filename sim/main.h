@@ -10,6 +10,7 @@
 #define LUN1K
 #define SIMULATOR
 
+#define CCM_ATTRIBUTES  /* Hack :-) */
 #define CONSTRUCTOR_ATTRIBUTES	__attribute__((constructor));
 
 #define KEY_A (1<<0)

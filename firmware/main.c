@@ -1,5 +1,6 @@
 #include "main.h"
 #include "arm_math.h" 
+#include "../libs/mcp.h"
 
 //#include "lib/usb_serial.h"
 
@@ -74,47 +75,6 @@ uint16_t get_key_state( uint16_t key_mask )
 }
 
 
-#define MAX_ANIMATIONS 30
-
-static int animationcount;
-
-
-
-struct animation {
-	init_fun init_fp;
-	tick_fun tick_fp;
-	deinit_fun deinit_fp;
-	uint16_t duration;
-	uint16_t timing;
-};
-
-static struct animation animations[MAX_ANIMATIONS] CCM_ATTRIBUTES;
-
-
-
-void registerAnimation(init_fun init,tick_fun tick, deinit_fun deinit,uint16_t t, uint16_t count)
-{
-
-	// this is for initialization, probably registerAnimation gets called bevore global variables are initialized
-	static int firstrun = 1;
-
-	if(firstrun == 1)
-	{
-		firstrun = 0;
-		animationcount = 0;
-	}
-
-
-	if(animationcount == MAX_ANIMATIONS)
-		return;
-	animations[animationcount].init_fp = init;
-	animations[animationcount].tick_fp = tick;
-	animations[animationcount].deinit_fp = deinit;
-	animations[animationcount].duration = count;
-	animations[animationcount].timing = t;
-
-	animationcount++;
-}
 
 
 int main(void)
@@ -243,9 +203,6 @@ int main(void)
 //	n35p112_init();
 
 	
-	int current_animation = 0;
-	animations[current_animation].init_fp();
-	int tick_count = 0;
 	
 
 	int loopcount = 0;
@@ -272,32 +229,10 @@ int main(void)
 		
 
 
-		animations[current_animation].tick_fp();
-
 
 		lcdFlush();
 
-
-		tick_count++;
-
-
-		if(get_key_press(KEY_ESC))
-		{
-			animations[current_animation].deinit_fp();
-
-			current_animation++;
-			if(current_animation == animationcount)
-			{
-				current_animation = 0;
-			}
-			tick_count=0;
-	
-			lcdFillRGB(0,0,0);
-
-			animations[current_animation].init_fp();
-
-
-		}
+                mcp_tick();
 	}
 
 }

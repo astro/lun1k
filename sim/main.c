@@ -9,7 +9,7 @@
 #include <stdio.h>
 
 #include "main.h"
-
+#include "../libs/mcp.h"
 
 #include <string.h>
 
@@ -68,34 +68,23 @@ void  xfree (void *pMem)
 		libc_free(pSize);
 	}
 }
-
 #endif
 
 #define FRAMETIME 33
 
 int sdlpause = 0;
 
-#define MAX_ANIMATIONS 200
-#define MAX_APPS 200
+/* #define MAX_APPS 200 */
 
-int animationcount = 0;
-int appcount = 0;
-
-struct animation {
-	init_fun init_fp;
-	tick_fun tick_fp;
-	deinit_fun deinit_fp;
-	int duration;
-	int min_delay;
-} animations[MAX_ANIMATIONS];
+/* int appcount = 0; */
 
 
-struct app {
-	init_fun init_fp;
-	tick_fun tick_fp;
-	deinit_fun deinit_fp;
-	int min_delay;
-} apps[MAX_APPS];
+/* struct app { */
+/* 	init_fun init_fp; */
+/* 	tick_fun tick_fp; */
+/* 	deinit_fun deinit_fp; */
+/* 	int min_delay; */
+/* } apps[MAX_APPS]; */
 
 
 SDL_Surface* screen;
@@ -126,19 +115,6 @@ void getLedXY(uint8_t x, uint8_t y, uint8_t* red,uint8_t* green, uint8_t* blue) 
 	*blue = leds[y][x][2];
 }
 
-void registerAnimation(init_fun init,tick_fun tick, deinit_fun deinit,uint16_t t, uint16_t count)
-{
-	if(animationcount == MAX_ANIMATIONS)
-		return;
-	animations[animationcount].init_fp = init;
-	animations[animationcount].tick_fp = tick;
-	animations[animationcount].deinit_fp = deinit;
-	animations[animationcount].duration = count;
-	animations[animationcount].min_delay = t;
-
-	animationcount++;
-
-}
 
 static uint16_t key_press;
 uint16_t get_key_press( uint16_t key_mask )
@@ -180,8 +156,6 @@ int main(int argc __attribute__((__unused__)), char *argv[] __attribute__((__unu
 	srand(time(NULL));
 
 
-	int current_animation = 0;
-
 	screen = SDL_SetVideoMode(287,606,32, SDL_SWSURFACE | SDL_DOUBLEBUF);
 
 	IMG_Init(IMG_INIT_PNG);
@@ -191,9 +165,6 @@ int main(int argc __attribute__((__unused__)), char *argv[] __attribute__((__unu
 	SDL_BlitSurface(image,0,screen,0);
 	SDL_Flip(screen);
 
-	animations[current_animation].init_fp();
-
-	int tick_count = 0;
 	int running = 1;
 	//unsigned long long int startTime = get_clock();
 	Uint32 lastFrame = SDL_GetTicks(); 
@@ -240,8 +211,10 @@ int main(int argc __attribute__((__unused__)), char *argv[] __attribute__((__unu
 			}
 		}
 
-		animations[current_animation].tick_fp();
-
+                int t1 = SDL_GetTicks();
+		mcp_tick();
+                int t2 = SDL_GetTicks();
+                printf("Frametime: %i ms\n", t2 - t1);
 
 
 
@@ -280,26 +253,6 @@ int main(int argc __attribute__((__unused__)), char *argv[] __attribute__((__unu
 		lastFrame = SDL_GetTicks();
 
 
-		tick_count++;
-
-
-		if(tick_count == animations[current_animation].duration)
-		{
-			animations[current_animation].deinit_fp();
-
-			current_animation++;
-			if(current_animation == animationcount)
-			{
-				current_animation = 0;
-			}
-			tick_count=0;
-
-			lcdFillRGB(0,0,0);
-
-			animations[current_animation].init_fp();
-
-
-		}
 	}
 
 	SDL_Quit();
