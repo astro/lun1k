@@ -23,7 +23,7 @@ static void lcdDarken(void)
         for(int y = 0; y < LED_HEIGHT; y++)
                 for(int x = 0; x < LED_WIDTH; x++)
                         for(int i = 0; i < 3; i++)
-                                CLAMP(leds[y][x][i], 191);
+                                CLAMP(leds[y][x][i], 128);
 }
 
 
