@@ -96,13 +96,33 @@ static void draw_menu(void)
 {
         static int menu_y = 0;
         int y = menu_y;
+        static struct {
+                uint8_t direction;
+                int xd;
+        } selection_scroll = { 0, 0 };
 
         for(int i = 0; i < animationcount; i++) {
                 if (y > -16 && y < LED_HEIGHT) {
+                        int xd = i == current_animation ? selection_scroll.xd : 0;
                         if (i == current_animation) {
-                                draw_triangle(4, y + 2, 255, 255, 255);
+                                draw_triangle(4 - xd, y + 2, 255, 255, 255);
                         }
-                        draw_text_16pt(16, y, animations[i].name, 255, 255, 255);
+                        draw_text_16pt(16 - xd, y, animations[i].name, 255, 255, 255);
+                        if (i == current_animation) {
+                                int width = get_text_width_16pt(animations[i].name) + 24 - LED_WIDTH;
+                                if (width > 0) {
+                                        if (selection_scroll.direction == 0) {
+                                                selection_scroll.xd += 2;
+                                                if (selection_scroll.xd >= width)
+                                                        selection_scroll.direction = 1;
+                                        } else {
+                                                selection_scroll.xd -= 2;
+                                                if (selection_scroll.xd < 1)
+                                                        selection_scroll.direction = 0;
+                                        }
+                                } else
+                                        selection_scroll.xd = 0;
+                        }
                 }
                 if (i == current_animation) {
                         int scroll_diff = y - LED_HEIGHT / 2 + 10;
