@@ -210,5 +210,5 @@ static uint8_t tick(void) {
 
 static void constructor(void) CONSTRUCTOR_ATTRIBUTES
 void constructor(void) {
-    registerAnimation(init,tick,deinit, 0, 1000);
+        registerAnimation("Notch", init,tick,deinit, 0, 1000);
 }

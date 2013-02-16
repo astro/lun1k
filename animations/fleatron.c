@@ -141,5 +141,5 @@ static uint8_t tick(void) {
 
 static void constructor(void) CONSTRUCTOR_ATTRIBUTES
     void constructor(void) {
-    registerAnimation(init,tick,deinit, 10, 2000);
+        registerAnimation("Flea Tron", init,tick,deinit, 10, 2000);
 }

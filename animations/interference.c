@@ -56,7 +56,7 @@ static void deinit(void)
 
 static void constructor(void) CONSTRUCTOR_ATTRIBUTES
 void constructor(void) {
-	registerAnimation(init,tick,deinit, 4, 1638); 
+        registerAnimation("Interference", init,tick,deinit, 4, 1638); 
 }
 
 

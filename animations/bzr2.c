@@ -139,5 +139,5 @@ static uint8_t tick(void) {
 
 static void constructor(void) CONSTRUCTOR_ATTRIBUTES
 	void constructor(void) {
-	registerAnimation(init,tick,deinit, 20, 2000);
+        registerAnimation("bzr2",init,tick,deinit, 20, 2000);
 }

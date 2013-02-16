@@ -30,6 +30,6 @@ static uint8_t tick(void) {
 
 static void constructor(void) CONSTRUCTOR_ATTRIBUTES
 void constructor(void) {
-	registerAnimation(init,tick,deinit, 4, 300);
+        registerAnimation("Geometry Test", init,tick,deinit, 4, 300);
 }
 

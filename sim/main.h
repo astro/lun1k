@@ -4,6 +4,8 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+#include "libs/mcp.h"
+
 #define LED_WIDTH	128
 #define LED_HEIGHT	128
 
@@ -31,15 +33,10 @@ void  xfree (void *pMem);
 
 #endif
 
-typedef void (*init_fun)(void);
-typedef void (*deinit_fun)(void);
-typedef uint8_t (*tick_fun)(void);
-
 int sdlpause;
 
 uint32_t getSysTick(void);
 
-void registerAnimation(init_fun init,tick_fun tick,deinit_fun deinit, uint16_t t, uint16_t duration);
 //void registerApp(tick_fun tick,uint16_t t);
 void setLedXY(uint8_t x,uint8_t  y, uint8_t r,uint8_t g,uint8_t b);
 void invLedXY(uint8_t x,uint8_t  y);

@@ -9,7 +9,7 @@
 #include <stdio.h>
 
 #include "main.h"
-#include "../libs/mcp.h"
+#include "libs/mcp.h"
 
 #include <string.h>
 

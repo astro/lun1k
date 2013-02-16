@@ -1,6 +1,6 @@
 #include "main.h"
 #include "arm_math.h" 
-#include "../libs/mcp.h"
+#include "libs/mcp.h"
 
 //#include "lib/usb_serial.h"
 
